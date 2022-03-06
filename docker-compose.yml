@@ -1,0 +1,74 @@
+version: "3.9"
+
+services:
+
+  poll:
+    build:
+      context: ./pool
+      dockerfile: Dockerfile
+    ports:
+      - "5000:80"
+    networks:
+      - poll-tier
+    restart: always
+    environment:
+      - POSTGRES_DB=popey
+      - POSTGRES_USER=an_admin
+      - POSTGRES_PASSWORD=123456
+
+  redis:
+    image: "redis"
+    ports:
+      - "6379:6379"
+    networks:
+      - poll-tier
+      - back-tier
+    restart: always
+
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile
+    networks:
+      - back-tier
+    restart: always
+    environment:
+      - POSTGRES_DB=popey
+      - POSTGRES_USER=an_admin
+      - POSTGRES_PASSWORD=123456
+
+  db:
+    image: "postgres"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    networks:
+      - result-tier
+      - back-tier
+    restart: always
+    environment:
+      - POSTGRES_DB=popey
+      - POSTGRES_USER=an_admin
+      - POSTGRES_PASSWORD=123456
+
+  result:
+    build:
+      context: ./result
+      dockerfile: Dockerfile
+    ports:
+      - "5001:8080"
+    networks:
+      - result-tier
+    restart: always
+    environment:
+      - POSTGRES_DB=popey
+      - POSTGRES_USER=an_admin
+      - POSTGRES_PASSWORD=123456
+
+volumes:
+  db-data:
+
+networks:
+  poll-tier:
+  result-tier:
+  back-tier:
