@@ -56,7 +56,7 @@ services:
       context: ./result
       dockerfile: Dockerfile
     ports:
-      - "5001:8080"
+      - "5001:80"
     networks:
       - result-tier
     restart: always
