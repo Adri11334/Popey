@@ -4,7 +4,7 @@ services:
 
   poll:
     build:
-      context: ./pool
+      context: ./poll
       dockerfile: Dockerfile
     ports:
       - "5000:80"
@@ -43,7 +43,7 @@ services:
       - POSTGRES_PASSWORD=123456
 
   db:
-    image: "postgres"
+    image: "postgres:9.4"
     volumes:
       - db-data:/var/lib/postgresql/data
       - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
